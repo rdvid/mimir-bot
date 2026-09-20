@@ -57,6 +57,7 @@
     </li>
     <li><a href="#usage">Usage</a></li>
     <li><a href="#api-mapping">API Mapping</a></li>
+    <li><a href="docs/USAGE.md">Usage guide (docs)</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
@@ -178,6 +179,8 @@ npm run build
 <!-- USAGE EXAMPLES -->
 ## Usage
 
+Full day-to-day guide: **[docs/USAGE.md](docs/USAGE.md)**.
+
 ### Commands
 
 | Command | Description |
@@ -189,34 +192,18 @@ npm run build
 
 ### Transaction syntax
 
-Send a plain message:
-
 ```text
 200 groceries
 45.50 lunch
-12 coffee
 ```
 
-Rules:
-
-- First number = amount (`.` or `,` decimals)
-- Rest of the line = description
-- MVP treats all plain messages as **expenses**
-
-Malformed input:
-
-```text
-I couldn't understand that.
-
-Example:
-200 groceries
-```
-
-### Example reply after creating an expense
+→
 
 ```text
 ✅ R$ 200,00 — groceries
 ```
+
+See [docs/USAGE.md](docs/USAGE.md) for rules, example replies, and error messages.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
