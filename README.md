@@ -146,14 +146,14 @@ To get a local copy up and running, follow these steps.
    ```
 3. Copy the env example and fill in values
    ```sh
-   cp .env.example .env
+   cp .env.default .env
    ```
 4. Configure environment variables
 
    | Variable | Description |
    |----------|-------------|
    | `TELEGRAM_BOT_TOKEN` | Bot token from BotFather |
-   | `API_URL` | Base URL of mimir-api (e.g. `http://localhost:5000`) |
+   | `API_URL` | Base URL of mimir-api — `http://localhost:5000` (host) or `http://host.docker.internal:5000` (bot in Docker) |
    | `TELEGRAM_ALLOWED_USER_ID` | Your numeric Telegram user ID — all other users are ignored |
    | `API_EMAIL` | Email for `POST /auth/login` |
    | `API_PASSWORD` | Password for `POST /auth/login` |
@@ -171,6 +171,65 @@ npm start          # one-shot
 npm run typecheck
 npm run build
 ```
+
+### Docker
+
+The bot is a long-polling worker (no HTTP port). It only makes outbound connections to Telegram and mimir-api.
+
+**Topology:** [mimir-api](https://github.com/rdvid/mimir-api) and **mimir-bot** are separate repos with their own `docker-compose` stacks. Both run on the **same machine** — your laptop (dev) or a VPS (prod). The API publishes port `5000` on the host; the bot reaches it via `host.docker.internal`.
+
+```text
+┌─ same machine (laptop or VPS) ─────────────────────┐
+│  mimir-api compose          mimir-bot compose      │
+│  ┌──────────────┐           ┌──────────────┐       │
+│  │ mimir-api    │◄──:5000───│ mimir-bot    │       │
+│  │ + postgres   │  (host)   │ (long poll)  │       │
+│  └──────────────┘           └──────┬───────┘       │
+└────────────────────────────────────┼───────────────┘
+                                     │ HTTPS
+                                     ▼
+                               Telegram API
+```
+
+**Prerequisites:** mimir-api already up (`docker compose up` in that repo), and `.env` filled for the bot.
+
+**`API_URL` when running the bot in Docker** (same value for local and VPS):
+
+```env
+API_URL=http://host.docker.internal:5000
+```
+
+`docker-compose.yml` adds `host.docker.internal:host-gateway` so this works on Linux (Docker Desktop already provides it on Mac/Windows).
+
+When running the bot **outside** Docker (`npm run dev`), use `API_URL=http://localhost:5000` instead.
+
+Local development (hot reload via bind mount):
+
+```sh
+# in mimir-api:  docker compose up -d   (or their docker:dev)
+# in mimir-bot:
+npm run docker:dev
+# or: docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+```
+
+Production / VPS (detached):
+
+```sh
+# in mimir-api:  docker compose up -d --build
+# in mimir-bot:
+npm run docker:up
+# or: docker compose up --build -d
+```
+
+Stop / logs:
+
+```sh
+npm run docker:down        # production
+npm run docker:dev:down    # development overlay
+docker compose logs -f bot
+```
+
+Only one bot instance should poll the same Telegram token at a time (do not run `npm run dev` and Docker concurrently with the same token).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
