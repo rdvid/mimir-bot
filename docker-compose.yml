@@ -11,6 +11,9 @@ services:
     container_name: mimir-bot
     env_file:
       - .env
+    environment:
+      # localhost inside the container is the bot itself — reach mimir-api on the host
+      API_URL: http://host.docker.internal:5000
     extra_hosts:
       # Linux: map host.docker.internal → host gateway (API on :5000)
       - 'host.docker.internal:host-gateway'

@@ -14,6 +14,7 @@ services:
     environment:
       NODE_ENV: development
       CHOKIDAR_USEPOLLING: 'true'
+      API_URL: http://host.docker.internal:5000
     command: npm run dev
     restart: 'no'
 
