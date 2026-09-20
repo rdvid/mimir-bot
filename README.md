@@ -191,7 +191,7 @@ The bot is a long-polling worker (no HTTP port). It only makes outbound connecti
                                Telegram API
 ```
 
-**Prerequisites:** mimir-api already up (`docker compose up` in that repo), and `.env` filled for the bot.
+**Prerequisites:** `.env` filled for the bot. mimir-api can already be running, or `make dev` will start it.
 
 **`API_URL` when running the bot in Docker** (same value for local and VPS):
 
@@ -206,27 +206,35 @@ When running the bot **outside** Docker (`npm run dev`), use `API_URL=http://loc
 Local development (hot reload via bind mount):
 
 ```sh
-# in mimir-api:  docker compose up -d   (or their docker:dev)
-# in mimir-bot:
+# Starts mimir-api first (make -C ../mimir-api up if needed), then the bot:
+make dev
+
+# Same via npm:
 npm run docker:dev
-# or: docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+```
+
+`make help` lists all targets. Override the API path if it is not a sibling:
+
+```sh
+make dev API_DIR=/path/to/mimir-api
 ```
 
 Production / VPS (detached):
 
 ```sh
-# in mimir-api:  docker compose up -d --build
+# in mimir-api:  docker compose up -d --build   (or make up / their prod flow)
 # in mimir-bot:
-npm run docker:up
-# or: docker compose up --build -d
+make prod-up
+# or: npm run docker:up
 ```
 
 Stop / logs:
 
 ```sh
-npm run docker:down        # production
-npm run docker:dev:down    # development overlay
-docker compose logs -f bot
+make down        # stop bot only (API left running)
+make prod-down   # stop production bot
+make logs        # follow bot logs
+# stop API separately: make -C ../mimir-api down
 ```
 
 Only one bot instance should poll the same Telegram token at a time (do not run `npm run dev` and Docker concurrently with the same token).

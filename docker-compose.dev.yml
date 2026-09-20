@@ -1,7 +1,8 @@
 # Local development overlay — hot reload via tsx watch + bind mounts.
 # Same machine as mimir-api compose; use API_URL=http://host.docker.internal:5000
-# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
-# Or:    npm run docker:dev
+# Preferred: make dev  (starts mimir-api via its Makefile if needed, then this stack)
+# Or:        npm run docker:dev
+
 
 services:
   bot:
